@@ -1,0 +1,96 @@
+---
+title: "Algo de diversión con deep learning y R+keras: Neuro Style Transfer"
+author: Pedro.ConcejeroCerezo@gmail.com
+date: 18 Abril 2018
+output:
+  html_document: default
+  html_notebook:
+    highlight: textmate
+    theme: cerulean
+---
+
+# Qué es eso de "Deep Learning"
+
+"As Richard Feynman once said about the universe: it's not complicated, it's just a lot of it"
+
+## Enlaces externos
+
+[Coursera Deep Learning (Andrew Ng y equipo)](https://www.deeplearning.ai/)
+
+[Keras](https://keras.io/)
+
+[Keras para R, thx Rstudio](https://keras.rstudio.com/)
+
+[Françoise Chollet](https://github.com/fchollet)
+
+[Más enlaces sobre Chollet-1](https://medium.com/@francois.chollet)
+
+[Más enlaces sobre Chollet-2](https://twitter.com/fchollet)
+
+Françoise Chollet es el autor de los dos libros esenciales sobre Deep Learning / Keras:[Deep Learning with R](https://www.manning.com/books/deep-learning-with-r)
+
+[También versión para python](https://www.manning.com/books/deep-learning-with-python)
+
+[Repositorio github de ejemplos keras - R](https://github.com/jjallaire/deep-learning-with-r-notebooks)
+
+[Paper esencial de Leon Gatys, Alexander Ecker y Matthias Bethge, 2015](https://arxiv.org/abs/1508.06576)
+
+
+# Instalar keras
+
+## Instalación en windows (CPU normal)
+
+```{r eval=FALSE}
+
+# caveat it requires installing Rtools
+devtools::install_github("rstudio/keras")
+
+# Load in the keras package
+library(keras)
+
+# it also installs TensorFlow, no need for additional installation 
+
+```
+
+## Instalar keras en ubuntu (con o sin GPU)
+
+[Apéndice A de libro Chollet keras - R](https://livebook.manning.com/#!/book/deep-learning-with-r/appendix-a)
+
+# Redes Neuronales Convolucionales (CNN)
+
+[Hay muchos videos explicativos en youtube](https://www.google.com/search?q=convolution+video)
+
+Pero a mi el que más me gusta es este (tomado del coursera)
+
+<iframe width="800" height="600" src="conv_kiank.mp4" frameborder="0" allowfullscreen></iframe>
+
+# Transfer Learning
+
+En un (descaradísimo y simplificadísimo) resumen: se trata de utilizar los pesos (modelo) entrenados para una tarea en otra tarea.
+
+En este caso usaremos el [modelo VGG19](https://arxiv.org/abs/1409.1556). 
+
+VGG es un modelo entrenado para el ImageNet Challenge 2014 -el paper es de 2015-, y es una red con arquitectura de 16 o 19 capas (usaremos la de 19).
+
+Para que nos hagamos una idea, VGG19 tiene 14.714 millones de parámetros entrenados.
+
+# Neuro Style Transfer
+
+[Código R / keras (Rmarkdown)](https://github.com/kylehamilton/deep-learning-with-r-notebooks/blob/master/notebooks/8.3-neural-style-transfer.Rmd)
+
+[Código python (notebook jupyter)](https://github.com/fchollet/deep-learning-with-python-notebooks/blob/master/8.3-neural-style-transfer.ipynb)
+
+Muy muy en resumen:
+
+- Partimos de una imagen de contenido y otra de estilo.
+- Calculamos las capas de activación de VGG19 para las tres imágenes: estilo, contenido y generada, a la vez.
+- Definimos una función de pérdida (loss) conjunta de la diferencia entre imagen generada (en cada iteración) y el contenido por un lado y del estilo por otra.
+- La función loss de estilo está definida por la "correlación entre filtros" de la imagen estilo (Gram Matrix). Técnicamente esto es la "unnormalized cross-covariance", siempre entre los filtros de la imagen. De este modo capturamos la "textura" de la imagen estilo.
+
+<iframe width="800" height="200" src="gram.png" frameborder="0" allowfullscreen></iframe>
+
+
+- Se realiza un proceso de optimización (minimización) de esa función loss usando un proceso de descenso de gradiente (gradient descent).
+
+En cada iteración del entrenamiento generamos una imagen que contendrá las características de alto nivel de la imagen de contenido (formas que definen la imagen), mezcladas con la textura de la imagen de estilo.
+
